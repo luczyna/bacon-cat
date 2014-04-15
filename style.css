@@ -1,0 +1,52 @@
+/*		B A C O N    C A T    I S    G R E A T 		*/
+
+html, body {
+	margin: 0;
+	padding: 0;
+	font-size: 100%;
+	background: #F1F1F1;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Source Sans Pro', sans-serif; letter-spacing: 1px; }
+p {	font-family: 'Source Sans Pro', sans-serif; }
+
+::selection {
+	color: white;
+	background-color: #f15d2f;
+}
+/*::-moz-selection {
+	color: black;
+	background-color: #f15d2f;
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 30em) {
+
+
+
+/* end mobile styling */
+}
+
+
+
+
+
+
