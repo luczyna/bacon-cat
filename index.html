@@ -3,10 +3,54 @@
 <head>
 	<title>bacon cat</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,700,300italic' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,700,300italic|Freckle+Face' rel='stylesheet' type='text/css'>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 </head>
 <body>
+
+	<div class="wrapper">
+		<div class="opening-view visible">
+			<!-- this is the opening view of the game -->
+			<h1>Bacon Cat</h1>
+			<button id="play">play</button>
+			<button id="howto">how to play</button>
+			<p id="highscore-main"></p>
+			<footer>
+				<p>baconated by tropvache and friends</p>
+			</footer>
+			<p id="howto-content">guide the bacon cat to collect as much bacon as you can in the allotted time limit</p>
+		</div>
+
+		<div class="playing-view not-visible">
+			<!-- this is the playing view, where you play the game -->
+			<header>
+				<span id="timer" class=""></span>
+				<span id="score" class="">0</span>
+			</header>
+
+			<div class="space">
+				<div class="lane" id="lane-1"></div>
+				<div class="lane" id="lane-2"></div>
+				<div class="lane" id="lane-3"></div>
+			</div>
+
+			<div class="platforms">
+				<span class="platform"></span>
+				<span class="platform"></span>
+				<span class="platform"></span>
+
+				<div id="cat" class="init"></div>
+
+				<div class="controls">
+					<div id="left"></div>
+					<div id="middle"></div>
+					<div id="right"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	
 
 	<!--	scripts 	-->
