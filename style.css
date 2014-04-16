@@ -99,6 +99,10 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
     color: #f1f1f1;
 }
 
+#highscore-main {
+    color: #f1f1f1;
+}
+
 #howto-content {
     display: none;
     position: absolute;
@@ -106,7 +110,6 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
     top: 15%;
     background: lightgreen;
     margin: 0 auto;
-
 }
 
 
@@ -246,7 +249,32 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 #middle { left: 33.33%; }
 #right { left: 66.66%; }
 
+/* end message for the game */
 
+.playing-view footer {
+    display: none;
+    padding: 1em;
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    background: palegreen;
+}
+
+.playing-view footer #endscore {
+    font-size: 4em;
+    margin: 0.25em 0;
+    letter-spacing: 2px;
+    color: darkolivegreen;
+    font-family: 'Freckle Face', sans-serif;
+}
+
+.playing-view footer #endmessage {
+    font-size: 2em;
+    margin: 0.25em 0;
+    letter-spacing: 0.2px;
+    color: darkslategray;
+    font-family: 'Freckle Face', sans-serif;
+}
 
 
 
