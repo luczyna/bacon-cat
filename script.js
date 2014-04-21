@@ -236,22 +236,22 @@ $(document).ready(function() {
             if ( direction == 'left' ) {
                 switch (current) {
                     case 1:
-                        cat.css({left: '3.66%'});
+                        cat.css({left: '8%'});
                         cat.removeClass('middle').addClass('left');
                         break;
                     case 2:
-                        cat.css({left: '37.66%'});
+                        cat.css({left: '41.66%'});
                         cat.removeClass('right').addClass('middle');
                         break;
                 }
             } else if ( direction == 'right' ) {
                 switch (current) {
                     case 0:
-                        cat.css({left: '37.66%'});
+                        cat.css({left: '41.66%'});
                         cat.removeClass('left').addClass('middle');
                         break;
                     case 1:
-                        cat.css({left: '70.66%'});
+                        cat.css({left: '74.66%'});
                         cat.removeClass('middle').addClass('right');
                         break;
                 }
@@ -259,9 +259,9 @@ $(document).ready(function() {
         } else {
             //distance === 2
             if ( direction == 'left' ) {
-                cat.removeClass('right').addClass('middle').css({left: '37.66%'}).css({left: '3.66%'}).removeClass('middle').addClass('left');
+                cat.removeClass('right').addClass('middle').css({left: '41.66%'}).css({left: '8%'}).removeClass('middle').addClass('left');
             } else {
-                cat.removeClass('left').addClass('middle').css({left: '37.66%'}).css({left: '70.66%'}).removeClass('middle').addClass('right');
+                cat.removeClass('left').addClass('middle').css({left: '41.66%'}).css({left: '74.66%'}).removeClass('middle').addClass('right');
             }
         }
     }
