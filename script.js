@@ -3,7 +3,7 @@ $(document).ready(function() {
     var timer;
     var spawn;
     var items = [];
-    var itemOptions = ['bacon', 'catnip', 'bacon', 'bacon', 'brocolli', 'coal', 'poop'];
+    var itemOptions = ['bacon', 'catnip', 'bacon', 'bacon', 'brocolli', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop'];
 
     function init() {
         //assign height to wrapper

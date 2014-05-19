@@ -120,7 +120,8 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 
 /* game screen */
 .playing-view {
-    background: #5f5f5f;
+    background: url(images/space.jpg) top center no-repeat;
+    background-size: cover;
     display: none;
 }
 
@@ -135,14 +136,23 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 #timer {
     display: inline-block;
     width: 20%;
-    background: #f8f8f8;
+    background: rgba(255, 255, 255, 0.4);
+    color: #f8f8f8;
     padding: 0.25em;
+}
+
+#timer-helper {
+    display: inline-block;
+    width: 7%;
+    vertical-align: bottom;
+    margin: 0 0.25em 0 0;
 }
 
 #score {
     display: inline-block;
-    width: 60%;
-    background: #f8f8f8;
+    width: 45%;
+    background: rgba(255, 255, 255, 0.4);
+    color: #f8f8f8;
     padding: 0.25em;
     margin: 0 0 0 18%;
     text-align: right;
@@ -159,7 +169,7 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 
 .space .lane {
     float: left;
-    background: tomato;
+    background: rgba(224, 64, 108, 0.4);
     width: 1%;
     margin: 0 16.16%;
     max-height: 60em;
@@ -169,16 +179,20 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 .lane .item {
     position: absolute;
     bottom: 100%;
-    width: 1em;
-    height: 1em;
-    
+    right: -2em;
+    /*left: 25%;*/
+    width: 4em;
+    height: 4em;
+    background-size: 4em 4em;
+    background-position: top center;
+    background-repeat: no-repeat;
 }
 
-.bacon { background: tomato; }
-.brocolli { background: green; }
-.catnip { background: blue; }
-.coal { background: grey; }
-.poop { background: brown; }
+.bacon { background: url(images/bacon.png); }
+.brocolli { background: url(images/brocolli.png); }
+.catnip { background: url(images/catnip.png); }
+.coal { background: url(images/coal.png); }
+.poop { background: url(images/poop.png); }
 
 .fast-pace {
     -o-transition: left 0.3s ease-out;
@@ -218,13 +232,16 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
     width: 15%;
     margin: 0 9.16%;
     height: 6em;
-    background: black;
+    background: url(images/platform.png);
+    background-position: top center;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
 }
 
 #cat {
     width: 5em;
     position: absolute;
-    bottom: 15%;
+    bottom: 75%;
     height: 5em;
     /*background: tomato;*/
     background: url('images/bc-player-2.png');
