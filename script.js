@@ -22,8 +22,15 @@ var timer,
  * in a bit in order to
  * control item spawns
  */
-//var itemOptions;
 var itemOptions = ['bacon', 'catnip', 'bacon', 'bacon', 'brocolli', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop'];
+// these are multipliers for increasing spawn counts?
+// var itemOptions = [
+//     bacon: 2.0,
+//     brocolli: 3.0,
+//     catnip: 1.5,
+//     coal: 2.0;
+//     poop: 3.0;
+// ];
 
 var boday = document.getElementsByTagName('body')[0];
 var cat   = document.getElementById('cat');
@@ -78,103 +85,110 @@ function startGame() {
     cat.classList.add('middle', 'normal-pace');
 
     //hide the opening view, and show the game view
-    // $('.opening-view').fadeOut(150, function() {
-    //     //add time to the game view
-    //     //first find out how many rounds have been played
-    //     var rounds = parseInt($('body').attr('data-rounds-played'), 10);
-    //     $('#timer').text('30');
-
-    //     //add score to the game view
-    //     $('#score').text(0);
-
-    //     //now show the game view
-    //     $('.playing-view').fadeIn(150, function() {
-    //         //assign height to lanes
-    //         $('.lane').height($('.space').height());
-
-    //         console.log('the game should be visible');
-
-    //         //start doing the things with baconcat, after a bit of a delay
-    //         window.setTimeout(gameWonders, 2000);
-    //     });
-    // });
+    hideView(open, setGameUp);
 }
-// everytime the page is reloaded, we run this
-init();
 
-// function gameWonders() {
-//     //start the timer
-//     timer = window.setInterval(gameTimer, 1000);
+function setGameUp() {
+    //add time to the game view
+    //this can be dependant on 
+    //the amount of rounds played at a current run
+    //add 5 seconds to each new game (30, 35, 40, ...)
+    var rounds = parseInt(boday.getAttribute('data-rounds-played'), 10);
+    document.getElementById('timer').innerText = (rounds * 5) * 30;
 
-//     //spawn a new item
-//     spawn = window.setInterval(itemSpawn, 500);
-// }
+    //set the score in the game view
+    document.getElementById('score').innerText = 0;
 
+    //show the game view
+    game.style.display = 'block';
 
+    //give the lanes height
+    var lanes = document.getElementsByClassName('lane');
+    for (var i = 0; i < lanes.length; i++) {
+        lanes[i].style.height = document.getElementsByClassName('space').style.height;
+    }
 
-// //show the how to content
-// $('#howto').click(function() {
-//     $('body').addClass('howto-engaged');
-//     $('#howto-content').fadeIn(200);
-// });
+    console.log('the game should be visible now');
 
-// //hide the how to content
-// $('#howto-content').on('click', function() {
-//     $('body').removeClass('howto-engaged');
-//     $('#howto-content').fadeOut(200);
-// });
+    //start doing things with baconcat, after a 2 second delay
+    window.setTimeout(gameWonders, 2000);
+}
 
+function gameWonders() {
+    //start the timer
+    timer = window.setInterval(gameTimer, 1000);
 
-
-
-
-
-
-// //this runs the game timer
-// function gameTimer() {
-//     var amount = parseInt($('#timer').text(), 10);
-
-//     //check the amount of time left
-//     if (amount === 0) {
-//         //the game is over
-//         window.clearInterval(timer);
-//         window.clearInterval(spawn);
-//         endGame();
-//     } else {
-//         //reduce the timer
-//         $('#timer').text(amount - 1);
-//         // console.log(amount + ' : this is the amount of time left');
-//     }
-// }
+    //spawn a new item
+    spawn = window.setInterval(itemSpawn, 500);
+}
 
 
 
-// //this spawns goodies every once in a while
-// function itemSpawn() {
 
-//     //will we spawn an item this time?
-//     var random_i = Math.floor(Math.random() * 100);
-//     if (random_i % 2) {
-//         // not this time
-//         return;
-//     } else {
-//         //check the item length
-//         var i = items.length;
 
-//         //choose a random option to spawn
-//         var random_j = Math.floor(Math.random() * itemOptions.length);
-//         items[i] = itemOptions[random_j];
 
-//         //choose a random speed to apply
-//         var random_el = Math.floor(Math.random() * 3) + 1;
-//         var speed = random_el * 1500;
-//         // console.log(speed);
 
-//         //add the item to a random lane
-//         var id = '#item-' + i;
-//         var add = '<div class="item ' + items[i] + '" id="item-' + i + '"></div>';
-//         var random_k = Math.floor(Math.random() * 3);
-//         $('.lane').eq(random_k).append(add);
+
+
+/* these are the working
+ * and auxillary functions
+ * that make the game run
+ */
+
+function gameTimer() {
+    var time = document.getElementById('timer');
+    var amount = parseInt(time.innerText, 10);
+
+    //check if we have time left
+    if (amount === 0) {
+        //the game is over
+        window.clearInterval(timer);
+        window.clearInterval(spawn);
+        endGame();
+    } else {
+        //the game is still going, reduce the timer
+        time.innerText = amount - 1;
+    }
+}
+
+function itemSpawn() {
+    var random_int = Math.floor(Math.random() * 100);
+
+    //will we spawn an item?
+    if (random_int % 2) {
+        //not this time
+        return;
+    } else {
+        itemCreation;
+    }
+}
+
+function itemCreation() {
+    //choose a random item to create
+    var i = items.length;
+    var random_int = Math.floor(Math.random() * itemOptions.length);
+    items[i] = itemOptions[random_int];
+
+    //apply a speed to the item
+    //we generate a number (x, y, z)
+    //and turn it into a second (time) attribute
+    //so you can either get 1500 (1.5s), 3000 (3s), or 4500 (4.5s)
+    var speed = (Math.floor(Math.random() * 3) + 1) * 1500;
+
+    //create the DOM element for the item
+    var div = document.createElement('div');
+    div.id = 'item-' + i;
+    div.classList.add('item', items[i]);
+
+    //add the item to a random lane (out of 3)
+    var random_el = Math.floor(Math.random() * 3);
+    var lane = document.getElementsByClassName('lane')[random_lane];
+    lane.appendChild(div);
+
+    //now shoot that item through time and space
+    //or just down towards the bacon cat
+
+}
 
 //         // animate this item to the bottom
 //         $(id).animate({ bottom: 0 }, speed, 'linear', function() {
@@ -189,6 +203,40 @@ init();
 //     }
 // }
 
+
+
+
+
+
+/* these will perform the
+ * most mundane but important
+ * of tasks for the game
+ */
+
+function hideView(whichView, callback) {
+    //hide the view we want done hidden
+    whichView.style.display = 'none';
+
+    //then perform this function when you are done
+    if (typeof callback === 'function') {
+        callback;
+    }
+}
+// everytime the page is reloaded, we run this
+init();
+
+
+// //show the how to content
+// $('#howto').click(function() {
+//     $('body').addClass('howto-engaged');
+//     $('#howto-content').fadeIn(200);
+// });
+
+// //hide the how to content
+// $('#howto-content').on('click', function() {
+//     $('body').removeClass('howto-engaged');
+//     $('#howto-content').fadeOut(200);
+// });
 
 
 // //check on bacon cat's position relative to an item 
