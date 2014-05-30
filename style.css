@@ -218,6 +218,31 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
     transition: left 1.1s ease-out;
 }
 
+/* item transitions */
+.fast-item {
+    -o-transition: bottom 1.5s ease-out;
+    -ms-transition: bottom 1.5s ease-out;
+    -moz-transition: bottom 1.5s ease-out;
+    -webkit-transition: bottom 1.5s ease-out;
+    transition: bottom 1.5s ease-out;
+}
+
+.normal-item {
+    -o-transition: bottom 3s ease-out;
+    -ms-transition: bottom 3s ease-out;
+    -moz-transition: bottom 3s ease-out;
+    -webkit-transition: bottom 3s ease-out;
+    transition: bottom 3s ease-out;
+}
+
+.slow-item {
+    -o-transition: bottom 4.5s ease-out;
+    -ms-transition: bottom 4.5s ease-out;
+    -moz-transition: bottom 4.5s ease-out;
+    -webkit-transition: bottom 4.5s ease-out;
+    transition: bottom 4.5s ease-out;
+}
+
 /* the platforms that bacon cat sits on */
 .platforms {
     /*background: palegreen;*/

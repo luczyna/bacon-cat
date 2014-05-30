@@ -76,6 +76,7 @@ function init() {
 
 
 function startGame() {
+    console.log('1. we tried to start the game');
     //add telltale to the body
     boday.classList.remove('in-open-view');
     boday.classList.add('in-game-view');
@@ -86,29 +87,32 @@ function startGame() {
 
     //hide the opening view, and show the game view
     hideView(open, setGameUp);
+    console.log('4. starting the game is finished');
 }
 
 function setGameUp() {
+    console.log('2. setting the game up');
     //add time to the game view
     //this can be dependant on 
     //the amount of rounds played at a current run
     //add 5 seconds to each new game (30, 35, 40, ...)
     var rounds = parseInt(boday.getAttribute('data-rounds-played'), 10);
-    document.getElementById('timer').innerText = (rounds * 5) * 30;
+    document.getElementById('timer').innerText = (rounds * 5) + 30;
 
     //set the score in the game view
     document.getElementById('score').innerText = 0;
 
     //show the game view
     game.style.display = 'block';
+    console.log('3. you should see the game now');
 
     //give the lanes height
     var lanes = document.getElementsByClassName('lane');
     for (var i = 0; i < lanes.length; i++) {
-        lanes[i].style.height = document.getElementsByClassName('space').style.height;
+        lanes[i].style.height = document.getElementsByClassName('space')[0].style.height;
     }
 
-    console.log('the game should be visible now');
+    console.log('3.5the game should be visible now');
 
     //start doing things with baconcat, after a 2 second delay
     window.setTimeout(gameWonders, 2000);
@@ -173,12 +177,20 @@ function itemCreation() {
     //we generate a number (x, y, z)
     //and turn it into a second (time) attribute
     //so you can either get 1500 (1.5s), 3000 (3s), or 4500 (4.5s)
-    var speed = (Math.floor(Math.random() * 3) + 1) * 1500;
+    var speed;
+    var speedTime = (Math.floor(Math.random() * 3) + 1) * 1500;
+    if (speedTime === 4500) {
+        speed = 'fast-item';
+    } else if (speedTime === 3000) {
+        speed = 'normal-item';
+    } else {
+        speed = 'slow-item';
+    }
 
     //create the DOM element for the item
     var div = document.createElement('div');
     div.id = 'item-' + i;
-    div.classList.add('item', items[i]);
+    div.classList.add('item', items[i], speed);
 
     //add the item to a random lane (out of 3)
     var random_el = Math.floor(Math.random() * 3);
@@ -187,58 +199,39 @@ function itemCreation() {
 
     //now shoot that item through time and space
     //or just down towards the bacon cat
+    div.style.bottom = 0;
+    div.addEventListener(transitionEnd, collectingBacon(item, lane), true);
 
+    // animate this item to the bottom
+    // $(id).animate({ bottom: 0 }, speed, 'linear', function() {
+    //      //now that it is set to the bottom of the lane, 
+    //      //check if it is in the same lane as bacon cat
+    //      collectingBacon(items[i], random_k);
+
+    //      //now you can destroy this item
+    //      $(this).remove();
+    // });
 }
 
-//         // animate this item to the bottom
-//         $(id).animate({ bottom: 0 }, speed, 'linear', function() {
-//             //now that it is set to the bottom of the lane, 
-//             //check if it is in the same lane as bacon cat
-//             collectingBacon(items[i], random_k);
+function collectingBacon(item, lane) {
+    //where was bacon cat?
+    var position;
+    if (cat.classList.contains('left')) {
+        position = 0;
+    } else if (cat.classList.contains('middle')) {
+        position = 1;
+    } else {
+        position = 2;
+    }
 
-//             //now you can destroy this item
-//             $(this).remove();
-//         });
-
-//     }
-// }
-
-
-
-
-
-
-/* these will perform the
- * most mundane but important
- * of tasks for the game
- */
-
-function hideView(whichView, callback) {
-    //hide the view we want done hidden
-    whichView.style.display = 'none';
-
-    //then perform this function when you are done
-    if (typeof callback === 'function') {
-        callback;
+    //did bacon cat intercept this item?
+    if (position !== lane) {
+        console.log('missed it');
+    } else {
+        //bacon cat got this item... but was it worth it?
+        console.log('you got it');
     }
 }
-// everytime the page is reloaded, we run this
-init();
-
-
-// //show the how to content
-// $('#howto').click(function() {
-//     $('body').addClass('howto-engaged');
-//     $('#howto-content').fadeIn(200);
-// });
-
-// //hide the how to content
-// $('#howto-content').on('click', function() {
-//     $('body').removeClass('howto-engaged');
-//     $('#howto-content').fadeOut(200);
-// });
-
-
 // //check on bacon cat's position relative to an item 
 // function collectingBacon(item, lane) {
 //     //did bacon cat intercept this item?
@@ -290,6 +283,80 @@ init();
 //         }
 //     }
 // }
+
+
+
+
+
+
+
+
+/* these will perform the
+ * most mundane but important
+ * of tasks for the game
+ */
+
+function hideView(whichView, callback) {
+    //hide the view we want done hidden
+    whichView.style.display = 'none';
+
+    //then perform this function when you are done
+    if (typeof callback === 'function') {
+        callback();
+    }
+}
+
+function showHow() {
+    boday.classList.add('howto-engaged');
+
+    var howto = document.getElementById('howto-content');
+    howto.style.display = 'block';
+
+    howto.addEventListener('click', hideHow, false);
+}
+
+function hideHow() {
+    boday.classList.remove('howto-engaged');
+
+    var howto = document.getElementById('howto-content');
+    howto.style.display = 'none';
+
+    howto.removeEventListener('click', hideHow);
+}
+
+
+
+
+
+
+
+
+
+/* here is now written
+ * the freshest bread and butter
+ * that the cat will eat
+ */
+
+// everytime the page is reloaded, we run this
+init();
+
+// the how-to content gets toggled with this
+document.getElementById('howto').addEventListener('click', showHow, false);
+
+// create the controls to start the game
+document.getElementById('play').addEventListener('click', startGame, false);
+// $(window).keyup(function(e) {
+//     //if it was the space bar
+//     if ( e.keyCode === 32 && $('body').hasClass('in-open-view') ) {
+//         // console.log('space bar pressed');
+//         startGame();
+//     }
+// });
+
+
+
+
+
 
 
 
@@ -455,15 +522,7 @@ init();
 
 
 
-// //create the controls to start the game
-// $('#play').click(startGame);
-// $(window).keyup(function(e) {
-//     //if it was the space bar
-//     if ( e.keyCode === 32 && $('body').hasClass('in-open-view') ) {
-//         // console.log('space bar pressed');
-//         startGame();
-//     }
-// });
+
 
 // //create the controls that move bacon cat
 // $('#left').click(function() { jumpingBacon(0); });
@@ -471,9 +530,3 @@ init();
 // $('#right').click(function() { jumpingBacon(2); });
 
 
-
-
-
-
-
-// $(window).load(init);
