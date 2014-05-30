@@ -22,15 +22,21 @@ var timer,
  * in a bit in order to
  * control item spawns
  */
-var itemOptions = ['bacon', 'catnip', 'bacon', 'bacon', 'brocolli', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop', 'coal', 'poop'];
+var itemOptions = [
+    'bacon', 'bacon', 'bacon',
+    'catnip',
+    'brocolli', 'brocolli',
+    'coal', 'coal', 'coal', 'coal',
+    'poop', 'poop', 'poop', 'poop'
+];
 // these are multipliers for increasing spawn counts?
-// var itemOptions = [
+// var itemOptions = {
 //     bacon: 2.0,
 //     brocolli: 3.0,
 //     catnip: 1.5,
 //     coal: 2.0;
 //     poop: 3.0;
-// ];
+// };
 
 var boday = document.getElementsByTagName('body')[0];
 var cat   = document.getElementById('cat');
@@ -83,9 +89,13 @@ function startGame() {
     //reset our bacon cat
     cat.classList.remove('left', 'right', 'slow-pace', 'fast-pace');
     cat.classList.add('middle', 'normal-pace');
+    cat.style.left = '41.66%'
 
     //hide the opening view, and show the game view
     hideView(open, setGameUp);
+    boday.classList.remove('in-open-view');
+    boday.classList.add('in-game-view');
+
 }
 
 function setGameUp() {
@@ -118,6 +128,74 @@ function gameWonders() {
 
     //spawn a new item
     spawn = window.setInterval(itemSpawn, 500);
+}
+
+function endGame() {
+    console.log('the game is over');
+
+    //stop the intervals that run the game
+    window.clearInterval(timer);
+    window.clearInterval(spawn);
+
+    //remove all items that might still be left
+    var stragglers = document.getElementsByClassName('item');
+    for (var i = 0; i < stragglers.length; i++) {
+        stragglers[i].style.display = 'none';
+        stragglers[i].parentNode.removeChild(stragglers[i]);
+    }
+    console.log('the items should be gone');
+
+    //update the body to count the rounds played
+    var rounds = parseInt(boday.getAttribute('data-rounds-played'), 10);
+    boday.getAttribute('data-rounds-played', rounds++);
+
+    //display the score of the game
+    var score = parseInt(document.getElementById('score').innerText, 10);
+    var message = endGameMessage(score);
+    document.getElementById('endmessage').innerText = message;
+
+    //update the highscore
+    var mainHighscore = document.getElementById('highscore-main');
+    if (window.localStorage.getItem('high-baconcat')) {
+        // there is information stored in this browser
+        var storedScore = parseInt(window.localStorage.getItem('high-baconcat'), 10);
+        //check if we need to update the info
+        if (storedScore < score) {
+            //we've done better this time. Update!
+            window.localStorage.setItem('high-baconcat', score);
+            mainHighscore.innerText = 'highscore: ' + score;
+        }
+    } else {
+        //there is nothing here, so create it
+        mainHighscore.innerText = 'highscore: ' + score;
+        window.localStorage.setItem('high-baconcat', score);
+    }
+
+    //show our footer with the end game messages
+    var gameFooter = game.children[4];
+    showView(gameFooter, delayedTransition);
+
+    
+}
+
+function delayedTransition() {
+    //a 3 hour tour (really only 2 seconds)
+    window.setTimeout(function() {
+        //this takes you from the end of the game back to the open screen
+        game.children[4].addEventListener('click', gameTransition, false);
+    }, 2000);
+}
+
+
+function gameTransition() {
+    //allow someone to click through this
+    var gameFooter = game.children[4];
+    gameFooter.style.display = 'none';
+    gameFooter.removeEventListener('click', gameTransition);
+    game.style.display = 'none';
+    open.style.display = 'block';
+    boday.classList.remove('in-game-view');
+    boday.classList.add('in-open-view');
 }
 
 
@@ -198,20 +276,9 @@ function itemCreation() {
         div.style.bottom = 0;
     }, 100);
     div.addEventListener('transitionend', collectingBacon, true);
-
-    // animate this item to the bottom
-    // $(id).animate({ bottom: 0 }, speed, 'linear', function() {
-    //      //now that it is set to the bottom of the lane, 
-    //      //check if it is in the same lane as bacon cat
-    //      collectingBacon(items[i], random_k);
-
-    //      //now you can destroy this item
-    //      $(this).remove();
-    // });
 }
 
 function collectingBacon() {
-    // console.log('ksjhfksdjf: ' + this.parentNode.id + this.id);
     //where was bacon cat?
     var position;
     if (cat.classList.contains('left')) {
@@ -224,7 +291,6 @@ function collectingBacon() {
 
     //did bacon cat intercept this item?
     var lane = parseInt(this.parentNode.id.replace('lane-', ''), 10) - 1;
-    console.log(lane);
 
     if (position !== lane) {
         console.log('missed it');
@@ -252,26 +318,7 @@ function catEats(item) {
     }
 
     //first lets change the speed of the cat
-    var updateSpeed;
-    if (currentSpeed === 'fast-pace' && item !== 'catnip') {
-        if (item === 'poop') {
-            updateSpeed = 'slow-pace';
-        } else {
-            updateSpeed = 'normal-pace'
-        }
-    } else if (currentSpeed === 'normal-pace' && item === 'catnip') {
-        updateSpeed = 'fast-pace';
-    } else if (currentSpeed === 'normal-pace' && item === 'poop') {
-        updateSpeed = 'slow-pace';
-    } else if (currentSpeed === 'slow-pace' && item === 'catnip') {
-        updateSpeed = 'fast-pace';
-    } else if (currentSpeed == 'slow-pace' && item === 'bacon') {
-        updateSpeed = 'normal-pace';
-    } else {
-        //no need to update speed
-        updateSpeed = false;
-    }
-
+    var updateSpeed = checkSpeed(currentSpeed, item);
     if (updateSpeed) {
         cat.classList.remove(currentSpeed);
         cat.classList.add(updateSpeed);
@@ -291,6 +338,80 @@ function catEats(item) {
     } else {
         score.innerText = parseInt(score.innerText, 10) + scoreData[item];
     }
+
+    //show a quip about your collection after the score update
+    scoreMessage(item); 
+}
+
+function jumpingBacon() {
+    //bacon cat can only jump one platform at a time
+
+    //where is bacon cat now?
+    var current = checkCat();
+    //where does bacon cat want to go?
+    var platform = checkPlatform(this.id);
+
+    //was the same platform clicked?
+    if (current === platform) {
+        //b, please
+        return;
+    }
+
+    //what direction do we need to go
+    //how far is bacon cat from the destination?
+    var direction;
+    var distance;
+    if (current <  platform) {
+        direction = 'right';
+        distance = platform - current;
+    } else {
+        direction = 'left';
+        distance = current - platform;
+    }
+
+    //lets move that bacon cat
+    if (distance === 1) {
+        if ( direction == 'left' ) {
+            switch (current) {
+                case 1:
+                    cat.style.left = '8%';
+                    catUpdate('middle', 'left');
+                    break;
+                case 2:
+                    cat.style.left = '41.66%';
+                    catUpdate('right', 'middle');
+                    break;
+            }
+        } else if ( direction == 'right' ) {
+            switch (current) {
+                case 0:
+                    cat.style.left = '41.66%';
+                    catUpdate('left', 'middle');
+                    break;
+                case 1:
+                    cat.style.left = '74.66%';
+                    catUpdate('middle', 'right');
+                    break;
+            }
+        }
+    } else {
+        // distance === 2
+        if ( direction == 'left' ) {
+            catUpdate('right', 'middle');
+            cat.style.left = '41.66%';
+            window.setTimeout(function() {
+                catUpdate('middle', 'left');
+                cat.style.left = '8%';
+            }, 600);
+        } else {
+            catUpdate('left', 'middle');
+            cat.style.left = '41.66%';
+            window.setTimeout(function() {
+                catUpdate('middle', 'right');
+                cat.style.left = '74.66%';
+            }, 600);
+        }
+    }
 }
 
 
@@ -309,6 +430,16 @@ function catEats(item) {
 function hideView(whichView, callback) {
     //hide the view we want done hidden
     whichView.style.display = 'none';
+
+    //then perform this function when you are done
+    if (typeof callback === 'function') {
+        callback();
+    }
+}
+
+function showView(whichView, callback) {
+    //hide the view we want done hidden
+    whichView.style.display = 'block';
 
     //then perform this function when you are done
     if (typeof callback === 'function') {
@@ -340,6 +471,89 @@ function removeBacon(item) {
     console.log('now the item should be removed');
 }
 
+function checkSpeed(current, item) {
+    if (current === 'fast-pace' && item !== 'catnip') {
+        if (item === 'poop') {
+            return 'slow-pace';
+        } else {
+            return 'normal-pace';
+        }
+    } else if (current === 'normal-pace' && item === 'catnip') {
+        return 'fast-pace';
+    } else if (current === 'normal-pace' && item === 'poop') {
+        return 'slow-pace';
+    } else if (current === 'slow-pace' && item === 'catnip') {
+        return 'fast-pace';
+    } else if (current == 'slow-pace' && item === 'bacon') {
+        return 'normal-pace';
+    } else {
+        //no need to update speed
+        return false;
+    }
+}
+
+function checkCat() {
+    //returns the current position of the bacon cat
+    if (cat.classList.contains('left')) {
+        return 0;
+    } else if (cat.classList.contains('middle')) {
+        return 1;
+    } else {
+        return 2;
+    }
+}
+
+function checkPlatform(position) {
+    switch (position) {
+        case 'left':
+            return 0;
+            break;
+        case 'middle':
+            return 1;
+            break;
+        case 'right':
+            return 2;
+            break;
+        default:
+            //defaulting to the middle platform
+            return 1;
+            break;
+    }
+}
+
+function catUpdate(removeThis, addThat) {
+    cat.classList.remove(removeThis);
+    cat.classList.add(addThat);
+}
+
+function scoreMessage(item) {
+    var message = {
+        'bacon': 'mmhmmmm',
+        'brocolli': 'how delightful',
+        'catnip': 'aww yisss',
+        'coal': '*hack*',
+        'poop': 'what\'s wrong with you?'
+    };
+
+    console.log(message[item]);
+}
+
+function endGameMessage(score) {
+    if (score > 1000) {
+        return 'bacon cat is pleased.';
+    } else if (score > 100 && score <= 1000) {
+        return 'bacon cat wants more bacon. AGAIN!';
+    } else {
+        return 'do you even think this cat should be eating bacon? IT SHOULD BE. GET TO WORK.';
+    }
+}
+
+function checkKey(e) {
+    if (e.keyCode == 32 && boday.classList.contains('in-open-view')) {
+        startGame();
+    }
+}
+
 
 
 
@@ -361,188 +575,11 @@ document.getElementById('howto').addEventListener('click', showHow, false);
 
 // create the controls to start the game
 document.getElementById('play').addEventListener('click', startGame, false);
-// $(window).keyup(function(e) {
-//     //if it was the space bar
-//     if ( e.keyCode === 32 && $('body').hasClass('in-open-view') ) {
-//         // console.log('space bar pressed');
-//         startGame();
-//     }
-// });
+window.addEventListener('keyup', checkKey, false);
 
-
-
-
-
-
-
-
-// //this moves our bacon cat
-// // @param platform = (int) starting at 0, which platform to go to
-// function jumpingBacon(platform) {
-//     //bacon cat can only jump one platform at a time
-
-//     //where is bacon cat now?
-//     var current;
-//     if ( $('#cat').hasClass('left') ) {
-//         current = 0;
-//     } else if ( $('#cat').hasClass('middle') ) {
-//         current = 1;
-//     } else if ( $('#cat').hasClass('right') ) {
-//         current = 2;
-//     }
-
-//     //was the same platform clicked?
-//     if (current === platform) {
-//         //b, please
-//         return;
-//     }
-
-//     //what direction do we need to go
-//     //how far is bacon cat from the destination?
-//     var direction;
-//     var distance;
-//     if (current <  platform) {
-//         direction = 'right';
-//         distance = platform - current;
-//     } else {
-//         direction = 'left';
-//         distance = current - platform;
-//     }
-
-//     //lets move that bacon cat
-//     var cat = $('#cat');
-//     if (distance === 1) {
-//         if ( direction == 'left' ) {
-//             switch (current) {
-//                 case 1:
-//                     cat.css({left: '8%'});
-//                     cat.removeClass('middle').addClass('left');
-//                     break;
-//                 case 2:
-//                     cat.css({left: '41.66%'});
-//                     cat.removeClass('right').addClass('middle');
-//                     break;
-//             }
-//         } else if ( direction == 'right' ) {
-//             switch (current) {
-//                 case 0:
-//                     cat.css({left: '41.66%'});
-//                     cat.removeClass('left').addClass('middle');
-//                     break;
-//                 case 1:
-//                     cat.css({left: '74.66%'});
-//                     cat.removeClass('middle').addClass('right');
-//                     break;
-//             }
-//         }
-//     } else {
-//         //distance === 2
-//         if ( direction == 'left' ) {
-//             cat.removeClass('right').addClass('middle').css({left: '41.66%'}).css({left: '8%'}).removeClass('middle').addClass('left');
-//         } else {
-//             cat.removeClass('left').addClass('middle').css({left: '41.66%'}).css({left: '74.66%'}).removeClass('middle').addClass('right');
-//         }
-//     }
-// }
-
-
-
-// //end our game
-// function endGame() {
-
-//     console.log('the game is over');
-
-//     //stop the intervals that run the game
-//     // window.clearInterval(timer);
-//     // window.clearInterval(spawn);
-
-//     //remove all items that might still be left
-//     $('.item').fadeOut(100).remove();
-//     console.log('the items should be gone');
-
-//     //update the body to count the rounds played
-//     var rounds = parseInt($('body').attr('data-rounds-played'), 10);
-//     $('body').attr('data-rounds-played', rounds++);
-
-//     //display the score of the game
-//     var score = parseInt($('#score').text(), 10);
-//     var message;
-//     $('#endscore').text(score);
-//     if (score > 1000) {
-//         message = 'bacon cat is pleased.';
-//     } else if (score > 100 && score <= 1000) {
-//         message = 'bacon cat wants more bacon. AGAIN!';
-//     } else {
-//         message = 'do you even think this cat should be eating bacon? IT SHOULD BE. GET TO WORK.';
-//     }
-//     $('#endmessage').text(message);
-
-
-//     //update the highscore
-//     if (window.localStorage.getItem('high-baconcat')) {
-//         //there is information stored in this browser
-//         var storedScore = parseInt(window.localStorage.getItem('high-baconcat'), 10);
-//         //check if we need to update the info
-//         if (storedScore < score) {
-//             //we've done better this time. Update!
-//             window.localStorage.setItem('high-baconcat', score);
-//             $('#highscore-main').text('highscore: ' + score);
-//         }
-//     } else {
-//         //there is nothing here, so create it
-//         $('#highscore-main').text('highscore: ' + score);
-//         window.localStorage.setItem('high-baconcat', score);
-//     }
-
-//     $('.playing-view').find('footer').fadeIn(200, function() {
-
-//         console.log('you are seeing an end of game message');
-//         //now wait a bit, and then execute hiding of this and a transition
-//         // var footer = $(this);
-//         window.setTimeout(gameTransition, 2000);
-
-//     });
-// }
-
-
-// //transition to the next screen
-// function gameTransition() {
-//     //allow someone to click through this
-//     $('.playing-view').find('footer').click(function() {
-//         console.log('you clicked the message in the footer to play again');
-//         $(this).fadeOut(200, function() {
-
-//             //add telltale to the body
-//             $('body').removeClass('in-game-view').addClass('in-open-view');
-
-
-//             //hide the playing view, and show the opening view
-//             $('.playing-view').fadeOut(150, function() {
-
-
-//                 //now show the game view
-//                 $('.opening-view').fadeIn(150, function() {
-                    
-//                     console.log('back at the opening view');
-
-//                 });
-//             });
-//         });
-//     });
-// }
-
-
-
-
-
-
-
-
-
-
-// //create the controls that move bacon cat
-// $('#left').click(function() { jumpingBacon(0); });
-// $('#middle').click(function() { jumpingBacon(1); });
-// $('#right').click(function() { jumpingBacon(2); });
+//create the controls that move bacon cat
+document.getElementById('left').addEventListener('click', jumpingBacon, false);
+document.getElementById('middle').addEventListener('click', jumpingBacon, false);
+document.getElementById('right').addEventListener('click', jumpingBacon, false);
 
 
