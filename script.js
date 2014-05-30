@@ -76,7 +76,6 @@ function init() {
 
 
 function startGame() {
-    console.log('1. we tried to start the game');
     //add telltale to the body
     boday.classList.remove('in-open-view');
     boday.classList.add('in-game-view');
@@ -87,11 +86,9 @@ function startGame() {
 
     //hide the opening view, and show the game view
     hideView(open, setGameUp);
-    console.log('4. starting the game is finished');
 }
 
 function setGameUp() {
-    console.log('2. setting the game up');
     //add time to the game view
     //this can be dependant on 
     //the amount of rounds played at a current run
@@ -104,15 +101,12 @@ function setGameUp() {
 
     //show the game view
     game.style.display = 'block';
-    console.log('3. you should see the game now');
 
     //give the lanes height
     var lanes = document.getElementsByClassName('lane');
     for (var i = 0; i < lanes.length; i++) {
-        lanes[i].style.height = document.getElementsByClassName('space')[0].style.height;
+        lanes[i].style.height = document.getElementsByClassName('space')[0].offsetHeight + 'px';
     }
-
-    console.log('3.5the game should be visible now');
 
     //start doing things with baconcat, after a 2 second delay
     window.setTimeout(gameWonders, 2000);
@@ -163,7 +157,7 @@ function itemSpawn() {
         //not this time
         return;
     } else {
-        itemCreation;
+        itemCreation();
     }
 }
 
@@ -191,16 +185,19 @@ function itemCreation() {
     var div = document.createElement('div');
     div.id = 'item-' + i;
     div.classList.add('item', items[i], speed);
+    div.setAttribute('data-item', items[i]);
 
     //add the item to a random lane (out of 3)
     var random_el = Math.floor(Math.random() * 3);
-    var lane = document.getElementsByClassName('lane')[random_lane];
+    var lane = document.getElementsByClassName('lane')[random_el];
     lane.appendChild(div);
 
     //now shoot that item through time and space
     //or just down towards the bacon cat
-    div.style.bottom = 0;
-    div.addEventListener(transitionEnd, collectingBacon(item, lane), true);
+    window.setTimeout(function() {
+        div.style.bottom = 0;
+    }, 100);
+    div.addEventListener('transitionend', collectingBacon, true);
 
     // animate this item to the bottom
     // $(id).animate({ bottom: 0 }, speed, 'linear', function() {
@@ -213,7 +210,8 @@ function itemCreation() {
     // });
 }
 
-function collectingBacon(item, lane) {
+function collectingBacon() {
+    // console.log('ksjhfksdjf: ' + this.parentNode.id + this.id);
     //where was bacon cat?
     var position;
     if (cat.classList.contains('left')) {
@@ -225,64 +223,76 @@ function collectingBacon(item, lane) {
     }
 
     //did bacon cat intercept this item?
+    var lane = parseInt(this.parentNode.id.replace('lane-', ''), 10) - 1;
+    console.log(lane);
+
     if (position !== lane) {
         console.log('missed it');
     } else {
         //bacon cat got this item... but was it worth it?
         console.log('you got it');
+
+        var identity = this.getAttribute('data-item');
+        catEats(identity);
+    }
+
+    // now remove the item from the DOM and space and time and existence
+    removeBacon(this); 
+}
+
+function catEats(item) {
+    var score = document.getElementById('score');
+    var currentSpeed;
+    if (cat.classList.contains('fast-pace')) {
+        currentSpeed = 'fast-pace';
+    } else if (cat.classList.contains('normal-pace')) {
+        currentSpeed = 'normal-pace';
+    } else {
+        currentSpeed = 'slow-pace';
+    }
+
+    //first lets change the speed of the cat
+    var updateSpeed;
+    if (currentSpeed === 'fast-pace' && item !== 'catnip') {
+        if (item === 'poop') {
+            updateSpeed = 'slow-pace';
+        } else {
+            updateSpeed = 'normal-pace'
+        }
+    } else if (currentSpeed === 'normal-pace' && item === 'catnip') {
+        updateSpeed = 'fast-pace';
+    } else if (currentSpeed === 'normal-pace' && item === 'poop') {
+        updateSpeed = 'slow-pace';
+    } else if (currentSpeed === 'slow-pace' && item === 'catnip') {
+        updateSpeed = 'fast-pace';
+    } else if (currentSpeed == 'slow-pace' && item === 'bacon') {
+        updateSpeed = 'normal-pace';
+    } else {
+        //no need to update speed
+        updateSpeed = false;
+    }
+
+    if (updateSpeed) {
+        cat.classList.remove(currentSpeed);
+        cat.classList.add(updateSpeed);
+    }
+
+    //now let's update the score
+    var scoreData = {
+        'bacon': 100,
+        'brocolli': 1,
+        'catnip': 1000,
+        'coal': -1,
+        'poop': null
+    };
+    if (item === 'poop') {
+        //tough nuts, don't eat poop
+        score.innerText = 0;
+    } else {
+        score.innerText = parseInt(score.innerText, 10) + scoreData[item];
     }
 }
-// //check on bacon cat's position relative to an item 
-// function collectingBacon(item, lane) {
-//     //did bacon cat intercept this item?
-//     var cat = $('#cat');
-//     var position;
-//     if ( cat.hasClass('left') ) {
-//         position = 0;
-//     } else if ( cat.hasClass('middle') ) {
-//         position = 1;
-//     } else if ( cat.hasClass('right') ) {
-//         position = 2;
-//     }
 
-//     if ( position !== lane ) {
-//         console.log('missed it!');
-//     } else {
-//         var score = parseInt($('#score').text(), 10);
-//         switch (item) {
-//             case 'bacon':
-//                 $('#score').text(score + 100);
-//                 cat.removeClass('slow-pace');
-//                 if (!cat.hasClass('fast-pace')) {
-//                     cat.addClass('normal-pace');
-//                 }
-//                 break;
-//             case 'brocolli':
-//                 $('#score').text(score + 1);
-//                 break;
-//             case 'coal':
-//                 if (score - 100 <= 0) {
-//                     $('#score').text(0);
-//                 } else {
-//                     $('#score').text(score - 100);
-//                 }
-//                 cat.removeClass('normal-pace fast-pace').addClass('slow-pace');
-//                 break;
-//             case 'poop':
-//                 $('#score').text(0);
-//                 cat.removeClass('normal-pace fast-pace').addClass('slow-pace');
-//                 break;
-//             case 'catnip':
-//                 $('#score').text(score + 1000);
-//                 cat.removeClass('normal-pace slow-pace').addClass('fast-pace');
-//                 break;
-//             default:
-//                 //no change
-//                 // $('#score').text(score);
-//                 break;
-//         }
-//     }
-// }
 
 
 
@@ -322,6 +332,12 @@ function hideHow() {
     howto.style.display = 'none';
 
     howto.removeEventListener('click', hideHow);
+}
+
+function removeBacon(item) {
+    item.removeEventListener('transitionEnd', collectingBacon);
+    item.parentNode.removeChild(item);
+    console.log('now the item should be removed');
 }
 
 

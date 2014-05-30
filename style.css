@@ -220,27 +220,27 @@ p, span { font-family: 'Source Sans Pro', sans-serif; }
 
 /* item transitions */
 .fast-item {
-    -o-transition: bottom 1.5s ease-out;
-    -ms-transition: bottom 1.5s ease-out;
-    -moz-transition: bottom 1.5s ease-out;
-    -webkit-transition: bottom 1.5s ease-out;
-    transition: bottom 1.5s ease-out;
+    -o-transition: bottom 1.5s linear;
+    -ms-transition: bottom 1.5s linear;
+    -moz-transition: bottom 1.5s linear;
+    -webkit-transition: bottom 1.5s linear;
+    transition: bottom 1.5s linear;
 }
 
 .normal-item {
-    -o-transition: bottom 3s ease-out;
-    -ms-transition: bottom 3s ease-out;
-    -moz-transition: bottom 3s ease-out;
-    -webkit-transition: bottom 3s ease-out;
-    transition: bottom 3s ease-out;
+    -o-transition: bottom 3s linear;
+    -ms-transition: bottom 3s linear;
+    -moz-transition: bottom 3s linear;
+    -webkit-transition: bottom 3s linear;
+    transition: bottom 3s linear;
 }
 
 .slow-item {
-    -o-transition: bottom 4.5s ease-out;
-    -ms-transition: bottom 4.5s ease-out;
-    -moz-transition: bottom 4.5s ease-out;
-    -webkit-transition: bottom 4.5s ease-out;
-    transition: bottom 4.5s ease-out;
+    -o-transition: bottom 4.5s linear;
+    -ms-transition: bottom 4.5s linear;
+    -moz-transition: bottom 4.5s linear;
+    -webkit-transition: bottom 4.5s linear;
+    transition: bottom 4.5s linear;
 }
 
 /* the platforms that bacon cat sits on */
